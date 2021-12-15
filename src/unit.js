@@ -94,13 +94,10 @@ export default class Unit {
       
       
 
-      console.log(this.position.x - game.gameWidth / 2)
 
-    console.log(this.cubes.position.x)
       // this.cubes.position.set(this.position.x - game.gameWidth / 2, this.position.y - game.gameHeight / 2, 0);
 
-      this.game.scene.add( this.cubes );
-      console.log(this.cubes)
+      // this.game.scene.add( this.cubes );
 
       // this.mesh.matrixAutoUpdate  = false;
   // console.log(this.mesh)
@@ -111,6 +108,8 @@ export default class Unit {
   // draw the unit circle with different border widths
   changeXCenter(dx){
     this.position.x = this.position.x + dx;
+    // this.cubes.position.x -= dx;
+
   }
 
   draw(ctx) {

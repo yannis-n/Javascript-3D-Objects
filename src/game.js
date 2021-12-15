@@ -124,17 +124,93 @@ const shapeSums = [
     ]
   },
   {
-    sum: 8,
-    choices: [3,5,4,2]
+    sum: [
+      [
+        ['0','0','1','0'],
+        ['0','0','1','0'],
+        ['1','1','1','1']
+      ],
+      [
+        ['0','0','0','0'],
+        ['0','0','0','0'],
+        ['1','0','0','0']
+      ]
+    ],
+    choices: [
+      [
+        [
+          ['0','0','1','0'],
+          ['0','0','1','0'],
+          ['1','1','1','1']
+        ],
+        [
+          ['0','0','0','0'],
+          ['0','0','0','0'],
+          ['0','0','0','0']
+        ]
+      ],
+      [
+        [
+          ['0','0','1','0'],
+          ['0','1','1','0'],
+          ['1','1','1','0']
+        ],
+        [
+          ['0','0','0','0'],
+          ['0','0','0','0'],
+          ['1','1','0','0']
+        ]
+      ],
+      [
+        [
+          ['0','0','1','0'],
+          ['0','0','1','0'],
+          ['1','1','1','0']
+        ],
+        [
+          ['0','0','1','0'],
+          ['0','0','0','0'],
+          ['0','0','0','0']
+        ]
+      ],
+      [
+        [
+          ['0','0','1','0'],
+          ['0','0','1','0'],
+          ['0','1','1','1']
+        ],
+        [
+          ['0','0','0','0'],
+          ['0','0','0','0'],
+          ['0','1','0','0']
+        ]
+      ],
+      [
+        [
+          ['0','0','1','0'],
+          ['0','1','1','0'],
+          ['1','1','1','1']
+        ],
+        [
+          ['0','0','0','0'],
+          ['0','0','0','0'],
+          ['0','0','0','0']
+        ]
+      ],
+      [
+        [
+          ['0','0','1','0'],
+          ['0','0','1','0'],
+          ['1','1','1','1']
+        ],
+        [
+          ['0','0','0','0'],
+          ['0','0','0','0'],
+          ['1','0','0','0']
+        ]
+      ]
+    ]
   },
-  {
-    sum: 9,
-    choices: [4,2,5,6,1]
-  },
-  {
-    sum: 9,
-    choices: [4,2,5,6,1,3]
-  }
 ]
 
 
@@ -220,14 +296,19 @@ export default class ShapeSums {
     let unitsAreOutsideTheCanvas = true;
     [...this.elements['units']].forEach((object) => {
         object.changeXCenter(this.dx)
-        if (object.position.x + object.pathRadius > this.rect.left){
+        console.log(object.position.x)
+        console.log(this.unitMeasurement.radius)
+        console.log(this.rect)
+        if (object.position.x + this.unitMeasurement.radius > this.rect.left){
           unitsAreOutsideTheCanvas = false;
         }
       });
+      console.log(unitsAreOutsideTheCanvas)
       this.elements['centeredSum'].changeXCenter(this.dx)
-      if (this.elements['centeredSum'].position.x + this.elements['centeredSum'].pathRadius > this.rect.left){
+      if (this.elements['centeredSum'].position.x + this.unitMeasurement.radius > this.rect.left){
         unitsAreOutsideTheCanvas = false;
       }
+      console.log(unitsAreOutsideTheCanvas)
       return unitsAreOutsideTheCanvas  
   }
 
@@ -235,16 +316,10 @@ export default class ShapeSums {
   moveLevelInsideFrame(){
     [...this.elements['units']].forEach((object) => {
       object.changeXCenter(-this.dx);
-      object.points.forEach((point) => {
-        point.changeXCenter(-this.dx);
-
-      });
+      
     });
     this.elements['centeredSum'].changeXCenter(-this.dx);
-    this.elements['centeredSum'].points.forEach((point) => {
-      point.changeXCenter(-this.dx);
 
-    });
   }
 
   // For now this is where the level assessement happens.
@@ -270,14 +345,14 @@ return true
             let checkmark = document.getElementById("screen-checkmark")
             checkmark.style.display = 'block';
             setTimeout(() => {
-              checkmark.style.zIndex = '2';
+              checkmark.style.zIndex = '3';
               checkmark.classList.add("grow-checkmark");
             }, 5);
           } else{
             let crossmark = document.getElementById("screen-crossmark")
             crossmark.style.display = 'block';
             setTimeout(() => {
-              crossmark.style.zIndex = '2';
+              crossmark.style.zIndex = '3';
               crossmark.classList.add("grow-crossmark");
             }, 5);
             this.wrongAnswer = true;
@@ -314,6 +389,7 @@ return true
     if (this.gamestate === GAMESTATE.LEVELDONE){
 
       this.dx = - 2 * this.rect.right / this.step;
+      console.log(this.dx)
       if (this.moveLevelOutsideFrame()){
         this.centeredXMod = 2 * this.rect.right;
         this.dx = this.centeredXMod / this.step;
