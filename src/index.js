@@ -80,7 +80,7 @@ window.onload = function (){
     dirLight.position.set(10, 20, 0);
     scene.add(dirLight);
 
-  const renderer = new THREE.WebGLRenderer( { alpha: true } );
+  const renderer = new THREE.WebGLRenderer( { alpha: true, antialias: true } );
   renderer.setSize( GAME_WIDTH, GAME_HEIGHT );
   document.getElementsByClassName('screen-container')[0].appendChild( renderer.domElement );
   renderer.domElement.id = 'ThreedObjectsCanvas';

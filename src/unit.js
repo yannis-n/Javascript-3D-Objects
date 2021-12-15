@@ -46,35 +46,59 @@ export default class Unit {
   this.cubes = new THREE.Group();
 
 
-      for (let i = 0; i < this.geometry.length; i++) {
-        for (let y = 0; y < this.geometry[i].length; y++) {
-          if (this.geometry[i][y] === '1'){
-            let mesh = new THREE.Mesh( 
-              new THREE.BoxGeometry( this.cubeSize, this.cubeSize, this.cubeSize, 1, 1, 1 ), 
-              new THREE.MeshLambertMaterial({color : 0xff0000}) 
-            );
-
+      for (let z = 0; z < this.geometry.length; z++) {
+        for (let i = 0; i < this.geometry[z].length; i++) {
+          for (let y = 0; y < this.geometry[z][i].length; y++) {
+            if (this.geometry[z][i][y] === '1'){
+              let mesh = new THREE.Mesh( 
+                new THREE.BoxGeometry( this.cubeSize, this.cubeSize, this.cubeSize, 1, 1, 1 ), 
+                new THREE.MeshLambertMaterial({color : 0xff0000}) 
+              );
+  
+              var geo = new THREE.EdgesGeometry( mesh.geometry );
+              var mat = new THREE.LineBasicMaterial( { color: 0x000000, linewidth: 1 } );
+              var wireframe = new THREE.LineSegments( geo, mat );
+              wireframe.renderOrder = 1; // make sure wireframes are rendered 2nd
+              mesh.add( wireframe );
               
-            // this.cubes.rotation.y = Math.PI / 3;
-            // mesh.rotation.set(this.position.x - game.gameWidth / 2 + this.cubeSize * (y - 1), this.position.y - game.gameHeight / 2 + this.cubeSize * (i - 1), 0);
-                       
-      
-            mesh.position.set(this.cubeSize * (y - 1), this.cubeSize * (i - 1), 0);
-
-
-
-            this.cubes.add( mesh );
-          }
-        }
+              // this.cubes.rotation.y = Math.PI / 3;
+              // mesh.rotation.set(this.position.x - game.gameWidth / 2 + this.cubeSize * (y - 1), this.position.y - game.gameHeight / 2 + this.cubeSize * (i - 1), 0);
+                         
         
+              mesh.position.set(this.cubeSize * (y - 1), this.cubeSize * (i - 1), this.cubeSize * (z - 1));
+  
+  
+  
+              this.cubes.add( mesh );
+            }
+          }
+          
+        }        
       }
       let plusOrMinus = Math.random() < 0.5 ? -1 : 1;
       this.cubes.translateX (this.position.x - game.gameWidth / 2);
       this.cubes.translateY (this.position.y - game.gameHeight / 2);
-      // this.cubes.rotation.set(this.position.x - game.gameWidth / 2 , this.position.y - game.gameHeight / 2, 0);
-      this.cubes.rotation.y = plusOrMinus * Math.random() * 1;
-      this.cubes.rotation.z = plusOrMinus *  Math.random() * 1;  
-      this.cubes.rotation.x = plusOrMinus *  Math.random() * 1;  
+      this.cubes.translateZ (this.geometry.length / 2);
+
+      this.cubes.rotation.y = plusOrMinus * (0.1 + Math.random() * 1);
+      this.cubes.rotation.z = plusOrMinus * (0.1 + Math.random() * 1);  
+      this.cubes.rotation.x = plusOrMinus * (0.1 + Math.random() * 1);  
+      // this.cubes.translateX (this.position.x - game.gameWidth / 2);
+      // this.cubes.translateY (this.position.y - game.gameHeight / 2);
+      
+      
+      const box3 = new THREE.Box3().setFromObject(this.cubes);
+      const vector = new THREE.Vector3();
+      box3.getCenter(vector);
+      this.cubes.position.set(-vector.x, -vector.y, -vector.z);
+      
+      
+
+      console.log(this.position.x - game.gameWidth / 2)
+
+    console.log(this.cubes.position.x)
+      // this.cubes.position.set(this.position.x - game.gameWidth / 2, this.position.y - game.gameHeight / 2, 0);
+
       this.game.scene.add( this.cubes );
       console.log(this.cubes)
 
