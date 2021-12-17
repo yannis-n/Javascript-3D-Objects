@@ -1,5 +1,4 @@
-import { circleAndMouseCollissionDetection, createPolygon, pointInsidePolygon, pointsColliding, drawPolygon, circleInsidePolygon } from "../src/helper.js";
-import Point from "./point.js";
+import { createPolygon, drawPolygon } from "../src/helper.js";
 import * as THREE from '../node_modules/three/build/three.module.js';
 
 export default class Unit {

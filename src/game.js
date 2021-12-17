@@ -38,7 +38,7 @@ const sequences = [
 
 
 
-export default class ShapeSums {
+export default class ThreeDObjects {
   constructor(gameWidth, gameHeight, difficulty, canvas, scene, camera, renderer) {
     this.scene = scene
     this.camera = camera
@@ -118,6 +118,7 @@ export default class ShapeSums {
   }
 
   // That is used to move a level out of frame. You have to move explicitly all the seperable units
+  // Onve every move I check whether both the units around have been moved and the centered object.
   moveLevelOutsideFrame(){
     let unitsAreOutsideTheCanvas = true;
     [...this.elements['units']].forEach((object) => {
@@ -146,10 +147,7 @@ export default class ShapeSums {
   // For now this is where the level assessement happens.
   // It will probably become more complicared in the future
   correctAssessement(){
-    console.log(this.currentBoard['sum'])
-    console.log(this.clickedUnits)
     return array_compare(this.currentBoard['sum'],this.clickedUnits)
-    return true
   }
 
   update(deltaTime) {
@@ -157,8 +155,6 @@ export default class ShapeSums {
     if (this.clickedUnits.length > 0 ) {
       // this is where we should check if the sum is correcct
       if (this.gamestate === GAMESTATE.RUNNING) {
-        // this.updateGameState(GAMESTATE.LEVELDONE)
-        // this.clickedUnits.clear()
 
           // this determines how long the crossmark or checkmark will remain in frame
           this.counter = 50;
@@ -203,7 +199,6 @@ export default class ShapeSums {
           checkmark.classList.remove("grow-checkmark");
         }       
 
-        this.wrongAnswer = false
       }
       this.counter -= 1;
 
@@ -218,7 +213,7 @@ export default class ShapeSums {
         this.updateGameState(GAMESTATE.NEWLEVEL)
         this.updateCurrentSequence(this.currentSequence + 1)
         
-
+        // clean the 3d scene to prevent memory leaks. This needs testing
         while (this.elements['centeredSum'].cubes.children.length > 0)
         {
           this.elements['centeredSum'].cubes.children.forEach((object) => {
@@ -228,9 +223,10 @@ export default class ShapeSums {
             object.material.dispose();
           });
         }
-
         this.clearThree(this.scene)
-
+        
+        // this takes care of the coloring of the selected answer
+        this.wrongAnswer = false
 
         this.elements = drawBoard(this)
       }
@@ -246,10 +242,7 @@ export default class ShapeSums {
         this.moveLevelInsideFrame()
       }
       this.centeredXMod = this.centeredXMod - this.dx;     
-
     }
-
-
   }
   
   clearThree(obj){
