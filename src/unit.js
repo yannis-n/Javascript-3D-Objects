@@ -63,12 +63,9 @@ export default class Unit {
               
               // this.cubes.rotation.y = Math.PI / 3;
               // mesh.rotation.set(this.position.x - game.gameWidth / 2 + this.cubeSize * (y - 1), this.position.y - game.gameHeight / 2 + this.cubeSize * (i - 1), 0);
-                         
-        
+            
               mesh.position.set(this.cubeSize * (y - 1), this.cubeSize * (i - 1), this.cubeSize * (z - 1));
-  
-  
-  
+              
               this.cubes.add( mesh );
             }
           }
@@ -76,16 +73,19 @@ export default class Unit {
         }        
       }
       let plusOrMinus = Math.random() < 0.5 ? -1 : 1;
-      this.cubes.translateX (this.position.x - game.gameWidth / 2);
+      // Should a new level be loaded make sure that the new shapes are correctly placed.
+      // For some reason I have to invert the X position of the group to be positioned correctly.
+        this.cubes.translateX (-this.position.x  + game.gameWidth / 2);
+
+        
       this.cubes.translateY (this.position.y - game.gameHeight / 2);
       this.cubes.translateZ (this.geometry.length / 2);
-
+      
       this.cubes.rotation.y = plusOrMinus * (0.1 + Math.random() * 1);
       this.cubes.rotation.z = plusOrMinus * (0.1 + Math.random() * 1);  
       this.cubes.rotation.x = plusOrMinus * (0.1 + Math.random() * 1);  
       // this.cubes.translateX (this.position.x - game.gameWidth / 2);
       // this.cubes.translateY (this.position.y - game.gameHeight / 2);
-      
       
       const box3 = new THREE.Box3().setFromObject(this.cubes);
       const vector = new THREE.Vector3();
@@ -97,7 +97,7 @@ export default class Unit {
 
       // this.cubes.position.set(this.position.x - game.gameWidth / 2, this.position.y - game.gameHeight / 2, 0);
 
-      // this.game.scene.add( this.cubes );
+      this.game.scene.add( this.cubes );
 
       // this.mesh.matrixAutoUpdate  = false;
   // console.log(this.mesh)
@@ -108,8 +108,9 @@ export default class Unit {
   // draw the unit circle with different border widths
   changeXCenter(dx){
     this.position.x = this.position.x + dx;
-    // this.cubes.position.x -= dx;
+    this.cubes.position.x += dx;
 
+    
   }
 
   draw(ctx) {

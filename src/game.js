@@ -1,7 +1,9 @@
 import InputHandler from "../src/input.js";
 import { drawBoard } from "./boardBuilder.js";
 import { createMenu } from "../src/helperScreens.js";
-import { createHiDPICanvas, circleAndMouseCollissionDetection, shuffle, pointInsidePolygon  } from "../src/helper.js";
+import { createHiDPICanvas, circleAndMouseCollissionDetection, shuffle, pointInsidePolygon, array_compare  } from "../src/helper.js";
+import * as THREE from '../node_modules/three/build/three.module.js';
+import { ThreeDObjectLevels  } from "../src/levels.js";
 
 
 const GAMESTATE = {
@@ -34,184 +36,6 @@ const sequences = [
   ['1', '4', '23', '45', '78', '92', '111', '122', '123', '124', '125', '167' ],
 ]
 
-const shapeSums = [
-  {
-    sum: [
-      [
-        ['0','0','1','0'],
-        ['0','0','1','0'],
-        ['1','1','1','1']
-      ],
-      [
-        ['0','0','0','0'],
-        ['0','0','0','0'],
-        ['1','0','0','0']
-      ]
-    ],
-    choices: [
-      [
-        [
-          ['0','0','1','0'],
-          ['0','0','1','0'],
-          ['1','1','1','1']
-        ],
-        [
-          ['0','0','0','0'],
-          ['0','0','0','0'],
-          ['0','0','0','0']
-        ]
-      ],
-      [
-        [
-          ['0','0','1','0'],
-          ['0','1','1','0'],
-          ['1','1','1','0']
-        ],
-        [
-          ['0','0','0','0'],
-          ['0','0','0','0'],
-          ['1','1','0','0']
-        ]
-      ],
-      [
-        [
-          ['0','0','1','0'],
-          ['0','0','1','0'],
-          ['1','1','1','0']
-        ],
-        [
-          ['0','0','1','0'],
-          ['0','0','0','0'],
-          ['0','0','0','0']
-        ]
-      ],
-      [
-        [
-          ['0','0','1','0'],
-          ['0','0','1','0'],
-          ['0','1','1','1']
-        ],
-        [
-          ['0','0','0','0'],
-          ['0','0','0','0'],
-          ['0','1','0','0']
-        ]
-      ],
-      [
-        [
-          ['0','0','1','0'],
-          ['0','1','1','0'],
-          ['1','1','1','1']
-        ],
-        [
-          ['0','0','0','0'],
-          ['0','0','0','0'],
-          ['0','0','0','0']
-        ]
-      ],
-      [
-        [
-          ['0','0','1','0'],
-          ['0','0','1','0'],
-          ['1','1','1','1']
-        ],
-        [
-          ['0','0','0','0'],
-          ['0','0','0','0'],
-          ['1','0','0','0']
-        ]
-      ]
-    ]
-  },
-  {
-    sum: [
-      [
-        ['0','0','1','0'],
-        ['0','0','1','0'],
-        ['1','1','1','1']
-      ],
-      [
-        ['0','0','0','0'],
-        ['0','0','0','0'],
-        ['1','0','0','0']
-      ]
-    ],
-    choices: [
-      [
-        [
-          ['0','0','1','0'],
-          ['0','0','1','0'],
-          ['1','1','1','1']
-        ],
-        [
-          ['0','0','0','0'],
-          ['0','0','0','0'],
-          ['0','0','0','0']
-        ]
-      ],
-      [
-        [
-          ['0','0','1','0'],
-          ['0','1','1','0'],
-          ['1','1','1','0']
-        ],
-        [
-          ['0','0','0','0'],
-          ['0','0','0','0'],
-          ['1','1','0','0']
-        ]
-      ],
-      [
-        [
-          ['0','0','1','0'],
-          ['0','0','1','0'],
-          ['1','1','1','0']
-        ],
-        [
-          ['0','0','1','0'],
-          ['0','0','0','0'],
-          ['0','0','0','0']
-        ]
-      ],
-      [
-        [
-          ['0','0','1','0'],
-          ['0','0','1','0'],
-          ['0','1','1','1']
-        ],
-        [
-          ['0','0','0','0'],
-          ['0','0','0','0'],
-          ['0','1','0','0']
-        ]
-      ],
-      [
-        [
-          ['0','0','1','0'],
-          ['0','1','1','0'],
-          ['1','1','1','1']
-        ],
-        [
-          ['0','0','0','0'],
-          ['0','0','0','0'],
-          ['0','0','0','0']
-        ]
-      ],
-      [
-        [
-          ['0','0','1','0'],
-          ['0','0','1','0'],
-          ['1','1','1','1']
-        ],
-        [
-          ['0','0','0','0'],
-          ['0','0','0','0'],
-          ['1','0','0','0']
-        ]
-      ]
-    ]
-  },
-]
 
 
 export default class ShapeSums {
@@ -230,7 +54,7 @@ export default class ShapeSums {
     //padding between the units
     this.gap = 10
     // here making sure that the sequences are in the right order
-    this.shapeSums = shapeSums
+    this.ThreeDObjectLevels = ThreeDObjectLevels
     // set the current sequence to the first one
     this.updateCurrentSequence(0)
     // This is where the candidate sequence answer will be stored
@@ -249,24 +73,26 @@ export default class ShapeSums {
     
     this.difficulty = difficulty
 
+    this.centeredXMod = 0;
 
     this.menu = createMenu(this, gameWidth, gameHeight)
     
 
     this.elements = drawBoard(this)
     this.InputHandler = new InputHandler(this, GAMESTATE);
+    this.GAMESTATE = GAMESTATE
     this.updateGameState(GAMESTATE.RUNNING)
     this.InputHandler.init()
 
     this.unitErrors = {}
     this.step = 11
-    this.clickedUnits = new Set()
+    this.clickedUnits = []
   }
 
   // here we update the current sequence and also shuffled it
   updateCurrentSequence(i){
     this.currentSequence = i
-    this.currentBoard = this.shapeSums[i]
+    this.currentBoard = this.ThreeDObjectLevels[i]
     this.currentBoard['choices'] = shuffle(this.currentBoard['choices'])
     this.currentDimensions = this.currentBoard['choices'].length
 
@@ -296,19 +122,14 @@ export default class ShapeSums {
     let unitsAreOutsideTheCanvas = true;
     [...this.elements['units']].forEach((object) => {
         object.changeXCenter(this.dx)
-        console.log(object.position.x)
-        console.log(this.unitMeasurement.radius)
-        console.log(this.rect)
         if (object.position.x + this.unitMeasurement.radius > this.rect.left){
           unitsAreOutsideTheCanvas = false;
         }
       });
-      console.log(unitsAreOutsideTheCanvas)
       this.elements['centeredSum'].changeXCenter(this.dx)
       if (this.elements['centeredSum'].position.x + this.unitMeasurement.radius > this.rect.left){
         unitsAreOutsideTheCanvas = false;
       }
-      console.log(unitsAreOutsideTheCanvas)
       return unitsAreOutsideTheCanvas  
   }
 
@@ -325,22 +146,23 @@ export default class ShapeSums {
   // For now this is where the level assessement happens.
   // It will probably become more complicared in the future
   correctAssessement(){
-return true
+    console.log(this.currentBoard['sum'])
+    console.log(this.clickedUnits)
+    return array_compare(this.currentBoard['sum'],this.clickedUnits)
+    return true
   }
 
   update(deltaTime) {
-
     // this is were the transition between levels is handled
-    if (this.clickedUnits.size == 2 ) {
+    if (this.clickedUnits.length > 0 ) {
       // this is where we should check if the sum is correcct
       if (this.gamestate === GAMESTATE.RUNNING) {
         // this.updateGameState(GAMESTATE.LEVELDONE)
         // this.clickedUnits.clear()
-          this.updateGameState(GAMESTATE.ASSESSINGLEVEL)
 
           // this determines how long the crossmark or checkmark will remain in frame
           this.counter = 50;
-          
+
           if (this.correctAssessement()){
             let checkmark = document.getElementById("screen-checkmark")
             checkmark.style.display = 'block';
@@ -357,7 +179,8 @@ return true
             }, 5);
             this.wrongAnswer = true;
           }
-          
+          this.updateGameState(GAMESTATE.ASSESSINGLEVEL)
+
 
       }
     }
@@ -367,7 +190,7 @@ return true
 
       if (this.counter == 0){
         this.updateGameState(GAMESTATE.LEVELDONE)
-        this.clickedUnits.clear()
+        this.clickedUnits = []
 
         // expicitly reset the checkmark or crossmark
         if (this.wrongAnswer){
@@ -389,12 +212,26 @@ return true
     if (this.gamestate === GAMESTATE.LEVELDONE){
 
       this.dx = - 2 * this.rect.right / this.step;
-      console.log(this.dx)
       if (this.moveLevelOutsideFrame()){
         this.centeredXMod = 2 * this.rect.right;
         this.dx = this.centeredXMod / this.step;
         this.updateGameState(GAMESTATE.NEWLEVEL)
         this.updateCurrentSequence(this.currentSequence + 1)
+        
+
+        while (this.elements['centeredSum'].cubes.children.length > 0)
+        {
+          this.elements['centeredSum'].cubes.children.forEach((object) => {
+  
+            this.elements['centeredSum'].cubes.remove(object)
+            object.geometry.dispose();
+            object.material.dispose();
+          });
+        }
+
+        this.clearThree(this.scene)
+
+
         this.elements = drawBoard(this)
       }
     }
@@ -414,6 +251,27 @@ return true
 
 
   }
+  
+  clearThree(obj){
+    if (obj.type == 'AmbientLight' || obj.type == 'DirectionalLight' || obj.type == 'Scene') return;
+
+    while(obj.children.length > 0){ 
+      this.clearThree(obj.children[0])
+      obj.remove(obj.children[0]);
+    }
+    if(obj.geometry) obj.geometry.dispose()
+  
+    if(obj.material){ 
+      //in case of map, bumpMap, normalMap, envMap ...
+      Object.keys(obj.material).forEach(prop => {
+        if(!obj.material[prop])
+          return         
+        if(obj.material[prop] !== null && typeof obj.material[prop].dispose === 'function')                                  
+          obj.material[prop].dispose()                                                        
+      })
+      obj.material.dispose()
+    }
+  }   
 
   draw(ctx) {
     if (this.gamestate === GAMESTATE.RUNNING || this.gamestate === GAMESTATE.LEVELDONE || this.gamestate === GAMESTATE.NEWLEVEL || this.gamestate === GAMESTATE.ASSESSINGLEVEL) {
@@ -449,7 +307,7 @@ return true
       // find the Grid Unit that was actually clicked
       if (pointInsidePolygon([this.clicked.x, this.clicked.y],object.path)){
         object.clicked = true;
-        this.clickedUnits.add(object)
+        this.clickedUnits = object.geometry
       }
     });
   }
