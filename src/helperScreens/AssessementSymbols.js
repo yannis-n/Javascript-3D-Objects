@@ -3,6 +3,7 @@ const MENULINKS = {
     TUTORIAL : 1,
   };
   
+  
   export default class AssessementSymbols {
       constructor(game) {
         this.game = game
