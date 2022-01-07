@@ -5,12 +5,14 @@ export default class Unit {
   constructor(game, geometry,position, unitMeasurement, rotation, sumUnit = false) {
     this.game = game;
     this.geometry = geometry;
-    this.pointsRadius = 5;
     this.position = position;
     this.clicked = false;
 
     this.radius = game.unitMeasurement.radius
     this.cubeSize = game.unitMeasurement.radius / 4
+    // this is to keep in the initial box size in case of resizing the canvas
+    this.initialCubeSize = game.unitMeasurement.radius / 4
+    this.lastCubeScale = 1
     this.sides = game.currentDimensions;
     // this.sides = game.currentDimensions;
     if (sumUnit){
@@ -103,6 +105,50 @@ export default class Unit {
 
   }
 
+  updateSize(position, unitMeasurement) {
+
+    // Assign the designated Points for the Unit
+
+    this.position = position;
+
+    this.radius = unitMeasurement.radius
+
+
+
+    let cubeScale = 1 / ((this.initialCubeSize / (unitMeasurement.radius / 4)) )
+    this.cubeSize = unitMeasurement.radius / 4
+    console.log('position')
+    console.log('------')
+    console.log('-------')
+
+      this.cubes.position.x = -this.position.x + this.game.gameWidth / 2
+      this.cubes.position.y = this.position.y - this.game.gameHeight / 2
+      const box3 = new THREE.Box3().setFromObject(this.cubes);
+      const vector = new THREE.Vector3();
+      box3.getCenter(vector);
+      this.cubes.position.set(-vector.x, -vector.y, -vector.z);
+    
+
+
+    this.cubes.scale.x = cubeScale; // SCALE
+    this.cubes.scale.y = cubeScale; // SCALE
+    this.cubes.scale.z = cubeScale; // SCALE
+    
+    this.lastCubeScale = (this.initialCubeSize / (unitMeasurement.radius / 4))
+    this.apothem = this.radius * Math.cos(Math.PI/this.sides)
+    this.sideWidth = 2 * this.apothem * Math.tan(Math.PI/this.sides)
+    let pathX = this.position.x
+    if (this.game.centeredXMod > 0){
+      pathX -= this.game.centeredXMod
+    }
+        // this is where the polygon's point are saved should we need to test the unit against some positional statement
+        this.path = createPolygon(pathX, this.position.y, this.radius, this.sides , this.rotateAngle)
+        this.polygonHeight = Math.abs(this.path[0][1] - this.path[this.sides - 1][1])
+        
+        // Assign the designated Points for the Unit
+        this.pointPadding = 1
+      
+  }
 
   // draw the unit circle with different border widths
   changeXCenter(dx){

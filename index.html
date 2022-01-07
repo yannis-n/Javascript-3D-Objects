@@ -4,116 +4,14 @@
 	<title>3D Objects</title>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<style>
-		.screen-container{
-			position: relative;
-			width: fit-content;
-			width: 500px;
-			height: 500px;
-		}
-
-		#ThreedObjectsCanvas {
-			z-index: 2;
-			position: absolute;
-		}
-
-		#gameScreen { 
-			z-index: 2;
-			position: absolute;
-			background-color: #dcf1fa;
-		}
-
-		
-		.crossmark {
-			-webkit-transition: transform .4s ease-in-out;
-			background: #fff;
-			width: 22px;
-			height: 22px;
-			z-index: 1;
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			border-radius: 50%;
-			-ms-transform: translate(-50%, -50%); /* IE 9 */
-			-webkit-transform: translate(-50%, -50%); /* Chrome, Safari, Opera */
-			transform: translate(-50%, -50%);
-		}
-		
-		.crossmark1{
-			position: absolute;
-			width:3px;
-			height:12px;
-			background-color:rgb(171 2 3 / 97%);
-			top: 50%;
-			left: 50%;
-			-ms-transform: translate(-50%, -50%) rotate(45deg); /* IE 9 */
-			-webkit-transform: translate(-50%, -50%) rotate(45deg); /* Chrome, Safari, Opera */
-			transform: translate(-50%, -50%) rotate(45deg);
-		}
-
-		.crossmark2{
-			position: absolute;
-			width:3px;
-			height:12px;
-			background-color:rgb(171 2 3 / 97%);
-			top: 50%;
-			left: 50%;
-			-ms-transform: translate(-50%, -50%) rotate(-45deg); /* IE 9 */
-			-webkit-transform: translate(-50%, -50%) rotate(-45deg); /* Chrome, Safari, Opera */
-			transform: translate(-50%, -50%) rotate(-45deg);
-		}
-
-		.checkmark {
-			-webkit-transition: transform .4s ease-in-out;
-			display: block;
-			z-index: 1;
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			width: 22px;
-			height:22px;
-			border-radius: 50%;
-			background-color: #fff;
-			-ms-transform: translate(-50%, -50%) rotate(45deg); /* IE 9 */
-			-webkit-transform: translate(-50%, -50%) rotate(45deg); /* Chrome, Safari, Opera */
-			transform: translate(-50%, -50%) rotate(45deg);
-		}
-
-		.checkmark_stem {
-			position: absolute;
-			width:3px;
-			height:9px;
-			background-color:rgba(0,114,227,1);
-			left:11px;
-			top:6px;
-		}
-
-		.checkmark_kick {
-			position: absolute;
-			width:3px;
-			height:3px;
-			background-color:rgba(0,114,227,1);
-			left:8px;
-			top:12px;
-		}
-
-.grow-checkmark { 
-	-ms-transform: scale(5) translate(-10%, -10%) rotate(45deg); /* IE 9 */
-	-webkit-transform: scale(5) translate(-10%, -10%) rotate(45deg); /* Chrome, Safari, Opera */
-	transform: scale(5) translate(-10%, -10%) rotate(45deg);
-}
-
-.grow-crossmark { 
-	-ms-transform: scale(5) translate(-10%, -10%) ;/* IE 9 */
-	-webkit-transform: scale(5) translate(-10%, -10%) ;/* Chrome, Safari, Opera */
-	transform: scale(5) translate(-10%, -10%) ;}
-	</style>
+	<link rel="stylesheet" href="css/reset.css">
+	<link rel="stylesheet" href="css/index.css">
 </head>
 
 <body>	
 	
 
-	<div class="screen-container">
+	<div id="screen-container">
 		<canvas id="gameScreen" width="500" height="500"></canvas>
 		<span id="screen-checkmark" class="checkmark">
 			<div class="checkmark_stem"></div>

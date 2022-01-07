@@ -1,6 +1,6 @@
 import InputHandler from "../src/input.js";
 import { drawBoard } from "./boardBuilder.js";
-import { createMenu } from "../src/helperScreens.js";
+import { updateGameStateForHelperScreens, createAssessementSymbols, createMenu, createLoadingBar, createMenuBar, createStartingGameCountDown } from "../src/helperScreens/helperScreens.js";
 import { createHiDPICanvas, circleAndMouseCollissionDetection, shuffle, pointInsidePolygon, array_compare  } from "../src/helper.js";
 import * as THREE from '../node_modules/three/build/three.module.js';
 import { ThreeDObjectLevels  } from "../src/levels.js";
@@ -15,6 +15,8 @@ const GAMESTATE = {
   LEVELDONE: 5,
   LOADING: 6,
   ASSESSINGLEVEL: 7,
+  REST: 8,
+  STARTINGAME: 9
 };
 
 const unitMeasurement = {
@@ -81,12 +83,55 @@ export default class ThreeDObjects {
     this.elements = drawBoard(this)
     this.InputHandler = new InputHandler(this, GAMESTATE);
     this.GAMESTATE = GAMESTATE
-    this.updateGameState(GAMESTATE.RUNNING)
+    this.updateGameState(GAMESTATE.LOADING)
     this.InputHandler.init()
 
     this.unitErrors = {}
     this.step = 11
     this.clickedUnits = []
+
+    // this is where all the helper screens will be loaled #helperScreensCode
+    this.tutorial = 'test'
+    this.undoButtonFuncionality = false;
+    this.soundOn = true;
+    this.correctAndWrongAssessement = true;
+
+    
+    this.helperScreens = {
+      menu : createMenu(this, gameWidth, gameHeight),
+      assessementSymbols: createAssessementSymbols(this),    
+      loadingBar : createLoadingBar(this),
+      menuBar : createMenuBar(this),
+      startingGameCountDown: createStartingGameCountDown(this),
+    }
+  }
+
+  updateGameSize(GAME_WIDTH, GAME_HEIGHT){
+    this.gameWidth = GAME_WIDTH;
+    this.gameHeight = GAME_HEIGHT;
+    this.updateUnitMeasurement();
+    // this.clearThree(this.scene)
+
+    this.elements = drawBoard(this, this.elements)
+    this.rect = this.canvas.getBoundingClientRect()
+
+  }
+
+  render(){
+    this.renderer.render(this.scene, this.camera);
+
+  }
+
+  refreshAnswers(){
+    this.clickedUnits = []
+  }
+  
+  undoAnswers(){
+    this.clickedUnits = []
+  }
+
+  levelCompleted(){
+    return this.clickedUnits.length > 0
   }
 
   // here we update the current sequence and also shuffled it
@@ -108,10 +153,24 @@ export default class ThreeDObjects {
     //   unitHeight : (this.gameWidth - this.gap * (size-1)) / (size)
     // };
 
-    this.unitMeasurement = {
-        radius : this.gameWidth / 6,
-      };
+    
 
+      if (this.gameWidth < 400){
+        this.unitMeasurement = {
+          radius : 60,
+
+        };
+      } else if (this.gameWidth > 700){
+        this.unitMeasurement = {
+          radius : 80,
+
+        };
+      }else{
+        this.unitMeasurement = {
+          radius : this.gameWidth / 8,
+        };
+
+      }
   }
 
   start() {
@@ -151,58 +210,7 @@ export default class ThreeDObjects {
   }
 
   update(deltaTime) {
-    // this is were the transition between levels is handled
-    if (this.clickedUnits.length > 0 ) {
-      // this is where we should check if the sum is correcct
-      if (this.gamestate === GAMESTATE.RUNNING) {
-
-          // this determines how long the crossmark or checkmark will remain in frame
-          this.counter = 50;
-
-          if (this.correctAssessement()){
-            let checkmark = document.getElementById("screen-checkmark")
-            checkmark.style.display = 'block';
-            setTimeout(() => {
-              checkmark.style.zIndex = '3';
-              checkmark.classList.add("grow-checkmark");
-            }, 5);
-          } else{
-            let crossmark = document.getElementById("screen-crossmark")
-            crossmark.style.display = 'block';
-            setTimeout(() => {
-              crossmark.style.zIndex = '3';
-              crossmark.classList.add("grow-crossmark");
-            }, 5);
-            this.wrongAnswer = true;
-          }
-          this.updateGameState(GAMESTATE.ASSESSINGLEVEL)
-
-
-      }
-    }
-
-    if (this.gamestate === GAMESTATE.ASSESSINGLEVEL) {
-
-
-      if (this.counter == 0){
-        this.updateGameState(GAMESTATE.LEVELDONE)
-        this.clickedUnits = []
-
-        // expicitly reset the checkmark or crossmark
-        if (this.wrongAnswer){
-          let crossmark = document.getElementById("screen-crossmark")
-          crossmark.style.display = 'none';
-          crossmark.classList.remove("grow-crossmark");
-        }else{
-          let checkmark = document.getElementById("screen-checkmark")
-          checkmark.style.display = 'none';
-          checkmark.classList.remove("grow-checkmark");
-        }       
-
-      }
-      this.counter -= 1;
-
-    }
+        
 
     if (this.gamestate === GAMESTATE.LEVELDONE){
 
@@ -213,16 +221,6 @@ export default class ThreeDObjects {
         this.updateGameState(GAMESTATE.NEWLEVEL)
         this.updateCurrentSequence(this.currentSequence + 1)
         
-        // clean the 3d scene to prevent memory leaks. This needs testing
-        while (this.elements['centeredSum'].cubes.children.length > 0)
-        {
-          this.elements['centeredSum'].cubes.children.forEach((object) => {
-  
-            this.elements['centeredSum'].cubes.remove(object)
-            object.geometry.dispose();
-            object.material.dispose();
-          });
-        }
         this.clearThree(this.scene)
         
         // this takes care of the coloring of the selected answer
@@ -243,10 +241,12 @@ export default class ThreeDObjects {
       }
       this.centeredXMod = this.centeredXMod - this.dx;     
     }
+
+    updateGameStateForHelperScreens(this, GAMESTATE)
+
   }
   
   clearThree(obj){
-    if (obj.type == 'AmbientLight' || obj.type == 'DirectionalLight' || obj.type == 'Scene') return;
 
     while(obj.children.length > 0){ 
       this.clearThree(obj.children[0])
@@ -264,18 +264,24 @@ export default class ThreeDObjects {
       })
       obj.material.dispose()
     }
+
+    this.scene = new THREE.Scene();  
+
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    this.scene.add(ambientLight);
+  
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    dirLight.position.set(10, 20, 850);
+    this.scene.add(dirLight);
   }   
 
   draw(ctx) {
-    if (this.gamestate === GAMESTATE.RUNNING || this.gamestate === GAMESTATE.LEVELDONE || this.gamestate === GAMESTATE.NEWLEVEL || this.gamestate === GAMESTATE.ASSESSINGLEVEL) {
+    if (this.gamestate === GAMESTATE.RUNNING || this.gamestate === GAMESTATE.REST || this.gamestate === GAMESTATE.PAUSED || this.gamestate === GAMESTATE.LEVELDONE || this.gamestate === GAMESTATE.NEWLEVEL || this.gamestate === GAMESTATE.ASSESSINGLEVEL) {
       this.elements['centeredSum'].draw(ctx);
     [...this.elements['units']].forEach((object) => {
         object.draw(ctx)
       });
-    }
-
-    if (this.gamestate === GAMESTATE.MENU) {
-      this.menu.draw(ctx)
     }
   }
 

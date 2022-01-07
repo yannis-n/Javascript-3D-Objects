@@ -31,22 +31,13 @@ export default class InputHandler {
 
         document.addEventListener("keydown", event => {
           if (this.game.gamestate === this.GAMESTATE.RUNNING) {
-            const isNumber = /^[0-9]$/i.test(event.key)
-            if (isNumber){
-              this.game.fillNumber(event.key)
-            }else{
               switch (event.keyCode) {
-
-        
-                case 27:
-                  game.togglePause();
-                  break;
-        
-
-              }
-            }
+                case 32:
+                this.game.togglePause();
+                break;
+              }            
           }
-        });
+        }); 
 
         
     }

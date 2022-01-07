@@ -12,23 +12,23 @@ window.onload = function (){
   
   // let ctx = setupCanvas(canvas);
   
-  const GAME_WIDTH = rect.width;
-  const GAME_HEIGHT = rect.height;
-  const difficulty = 1;
+  let GAME_WIDTH = rect.width;
+  let GAME_HEIGHT = rect.height;
+  let difficulty = 1;
 
 
   var scene = new THREE.Scene();  
 
   var camera = new THREE.OrthographicCamera(
-    500 / -2, // left
-    500 / 2, // right
-    500 / 2, // top
-    500 / -2, // bottom
+    GAME_WIDTH / -2, // left
+    GAME_WIDTH / 2, // right
+    GAME_HEIGHT / 2, // top
+    GAME_HEIGHT / -2, // bottom
     1, // near plane
-    1000 // far plane
+    2000 // far plane
   );
   
-  camera.position.set(0, 0, 850);
+  camera.position.set(0, 0, GAME_WIDTH* 2);
   camera.lookAt(0, 0, 0);
 
     // Set up lights
@@ -41,7 +41,7 @@ window.onload = function (){
 
   const renderer = new THREE.WebGLRenderer( { alpha: true, antialias: true } );
   renderer.setSize( GAME_WIDTH, GAME_HEIGHT );
-  document.getElementsByClassName('screen-container')[0].appendChild( renderer.domElement );
+  document.getElementById('screen-container').appendChild( renderer.domElement );
   renderer.domElement.id = 'ThreedObjectsCanvas';
 
  
@@ -56,7 +56,7 @@ window.onload = function (){
       ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
       game.update(deltaTime)
       game.draw(ctx)
-      renderer.render(scene, camera);
+      game.render()
       // mesh.position.set(200, 200, 0);
       // mesh.updateMatrix()
       requestAnimationFrame(gameLoop);
@@ -67,6 +67,28 @@ window.onload = function (){
       // ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
       // game.draw(ctx)
     
+    
+      window.addEventListener('resize', function(){
+      let screenContainer = document.getElementById("screen-container");
+      canvas = createHiDPICanvas(screenContainer.offsetWidth, screenContainer.offsetHeight);
+      ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+      ctx = canvas.getContext('2d');
+
+      GAME_WIDTH = screenContainer.offsetWidth;
+      GAME_HEIGHT = screenContainer.offsetHeight;
+
+      game.updateGameSize(GAME_WIDTH, GAME_HEIGHT)
+
+      // camera.position.set(0, 0, GAME_WIDTH* 2);
+
+      camera.left = GAME_WIDTH / -2
+      camera.right = GAME_WIDTH / 2
+      camera.top = GAME_HEIGHT / 2
+      camera.bottom = GAME_HEIGHT / -2
+      camera.updateProjectionMatrix();
+      renderer.setSize( GAME_WIDTH, GAME_HEIGHT );
+
+    });
     
 }
 
