@@ -285,6 +285,10 @@ export default class ThreeDObjects {
     }
   }
 
+  renderIsHidden(){
+    return this.renderer.domElement.style.display == 'none';
+  }
+
   updateGameState(state){
     this.gamestate = state;
   }

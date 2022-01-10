@@ -41,6 +41,7 @@ window.onload = function (){
 
   const renderer = new THREE.WebGLRenderer( { alpha: true, antialias: true } );
   renderer.setSize( GAME_WIDTH, GAME_HEIGHT );
+  renderer.domElement.style.display = 'none';
   document.getElementById('screen-container').appendChild( renderer.domElement );
   renderer.domElement.id = 'ThreedObjectsCanvas';
 

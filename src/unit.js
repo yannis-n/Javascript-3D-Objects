@@ -7,7 +7,7 @@ export default class Unit {
     this.geometry = geometry;
     this.position = position;
     this.clicked = false;
-
+    this.sumUnit = sumUnit
     this.radius = game.unitMeasurement.radius
     this.cubeSize = game.unitMeasurement.radius / 4
     // this is to keep in the initial box size in case of resizing the canvas

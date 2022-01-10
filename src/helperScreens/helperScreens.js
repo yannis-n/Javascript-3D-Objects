@@ -122,6 +122,15 @@ export function updateGameStateForHelperScreens(game, GAMESTATE){
 
                 }
         }
+
+        // this is used to load the rendered for the 3d objects
+        if (game.gamestate === GAMESTATE.RUNNING) {
+                if (game.renderer){
+                        if (game.renderIsHidden()){
+                                document.getElementById('ThreedObjectsCanvas').style.display = 'flex'
+                        }
+                }
+        }
       
 }
 
